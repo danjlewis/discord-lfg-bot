@@ -1,0 +1,9 @@
+{
+    "default-prefix": "lfg!",
+    "help-embed-fields": {
+        "help": "Shows this help dialogue.",
+        "prefix": "Changes the bot prefix on this server (MODERATOR ONLY).",
+        "renamebot": "Renames the bot on all servers (CREATOR ONLY).",
+        "shutdownbot": "Shuts down the bot (CREATOR ONLY)."
+    }
+}
