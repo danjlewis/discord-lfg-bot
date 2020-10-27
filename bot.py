@@ -168,6 +168,7 @@ async def on_message(message):
                         else:
                             modonly = int(not bool(db["guilds"][str(message.guild.id)]["modonly"]))
                             db["guilds"][str(message.guild.id)]["modonly"] = modonly
+                            write_db()
                             await message.channel.send("Successfully enabled moderator only mode." if modonly else "Successfully disabled moderator only mode.")
                 else:
                     await message.channel.send(f"Invalid command! Use {db['guilds'][str(message.guild.id)]['prefix']}help to see all commands.")
