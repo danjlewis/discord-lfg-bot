@@ -149,7 +149,7 @@ async def on_message(message):
 
                                     request = await message.channel.send(f"{message.author.display_name} wants to play {args[1].replace(',', ' ')} with at least {min_players} people (when {min_players + 1} users have reacted)! " + \
                                                                 "If you want to play, react thumbs up on this message!")
-                                    
+
                                     await message.delete()
                                     if mention != None:
                                         await request.edit(content = request.content + f" {mention}")
