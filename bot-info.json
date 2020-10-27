@@ -1,0 +1,11 @@
+{
+    "default-prefix": "lfg!",
+    "help-embed-fields": {
+        "help [DM:server]": "Shows this help dialogue.",
+        "prefix <prefix>": "Changes the bot prefix on this server (MODERATOR ONLY).",
+        "renamebot <name>": "Renames the bot on all servers (CREATOR ONLY).",
+        "shutdownbot": "Shuts down the bot (CREATOR ONLY).",
+        "create <game> <minimum no. players> [role to ping]": "Creates a new LFG request. For the game argument, replace spaces with commas. The role to ping argument, if specified, needs to be the mention of the role (e.g. @Minecraft Player).",
+        "togglemodonly": "Toggles whether users need the Manage Server permission to create an LFG request in the server (MODERATOR ONLY)."
+    }
+}

@@ -1,0 +1,14 @@
+{
+    "bot": {
+        "display-name": "LFG Bot"
+    },
+    "guilds": {
+        "714926591259574382": {
+            "prefix": "lfg!",
+            "modonly": 0
+        }
+    },
+    "requests": [
+
+    ]
+}
