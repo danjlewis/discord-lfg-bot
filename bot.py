@@ -28,7 +28,7 @@ async def on_guild_join(guild):
                 await asyncio.sleep(1)
         else:
             break
-    
+
     db["guilds"][str(guild.id)] = {"prefix": bot_info["default-prefix"], "modonly": 0}
     write_db()
 
@@ -148,7 +148,7 @@ async def on_message(message):
                                         mention = message.role_mentions[0].mention
 
                                     request = await message.channel.send(f"{message.author.display_name} wants to play {args[1].replace(',', ' ')} with at least {min_players} people (when {min_players + 1} users have reacted)! " + \
-                                                                f"If you want to play, react thumbs up on this message!")
+                                                                "If you want to play, react thumbs up on this message!")
                                     
                                     await message.delete()
                                     if mention != None:
