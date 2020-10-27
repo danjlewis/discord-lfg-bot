@@ -54,7 +54,7 @@ async def on_raw_reaction_add(payload):
                     continue
                 else:
                     thumbsup = matching[0]
-                
+
                 db["requests"][index]["current-players"] = thumbsup.count - 1
                 if db["requests"][index]["current-players"] >= request["min-players"]:
                     db["requests"][index]["active"] = 0
@@ -157,7 +157,7 @@ async def on_message(message):
 
                                     db["requests"].append({"author": message.author.id, "message": request.id, "channel": request.channel.id, "current-players": 0, "min-players": min_players, "game": args[1].replace(',', ' '), "active": 1})
                                     write_db()
-                
+
                 elif args[0].lower() == "togglemodonly":
                     if len(args) != 1:
                         await message.channel.send("Incorrect number of arguments!")
