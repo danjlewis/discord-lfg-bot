@@ -1,1 +1,11 @@
-{"bot": {"display-name": "LFG Bot"}, "guilds": {}}
+{
+    "bot": {
+        "display-name": "LFG Bot"
+    },
+    "guilds": {
+
+    },
+    "requests": [
+
+    ]
+}
