@@ -6,9 +6,21 @@
         "714926591259574382": {
             "prefix": "lfg!",
             "modonly": 0
+        },
+        "708978441969598525": {
+            "prefix": "lfg!",
+            "modonly": 0
         }
     },
     "requests": [
-
+        {
+            "author": 299591245976829952,
+            "message": 770741540892311562,
+            "channel": 715870384943267840,
+            "current-players": 2,
+            "min-players": 5,
+            "game": "Among Us",
+            "active": 1
+        }
     ]
 }

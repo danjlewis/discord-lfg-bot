@@ -69,13 +69,13 @@ async def on_raw_reaction_add(payload):
 @client.event
 async def on_message(message):
     global db
-    if message.content.lower().startswith(db["guilds"][str(message.guild.id)]["prefix"]):
-        try:
-            print(f"Command issued by {message.author}" + (f" in {message.guild}" if message.guild != None else "") + f": {message.content}")
-            args = message.content[len(db["guilds"][str(message.guild.id)]["prefix"]):].split(" ")
-            if message.guild == None:
-                await message.channel.send("You can only use my commands in a server!")
-            else:
+    if message.guild == None:
+        await message.channel.send("You can only use my commands in a server!")
+    else:
+        if message.content.lower().startswith(db["guilds"][str(message.guild.id)]["prefix"]):
+            try:
+                print(f"Command issued by {message.author}" + (f" in {message.guild}" if message.guild != None else "") + f": {message.content}")
+                args = message.content[len(db["guilds"][str(message.guild.id)]["prefix"]):].split(" ")
                 if args[0].lower() == "help":
                     if len(args) not in range(1, 3):
                         await message.channel.send("Incorrect number of arguments!")
@@ -86,7 +86,8 @@ async def on_message(message):
                             if args[1].lower() == 'server':
                                 channel = message.channel
                             elif args[1].lower() == 'dm':
-                                message.author.create_dm()
+                                if message.author.dm_channel == None:
+                                    await message.author.create_dm()
                                 channel = message.author.dm_channel
                         embed = discord.Embed(title = f"{db['bot']['display-name']} command list")
                         for name, value in bot_info["help-embed-fields"].items():
@@ -170,10 +171,10 @@ async def on_message(message):
                             await message.channel.send("Successfully enabled moderator only mode." if modonly else "Successfully disabled moderator only mode.")
                 else:
                     await message.channel.send(f"Invalid command! Use {db['guilds'][str(message.guild.id)]['prefix']}help to see all commands.")
-        except discord.Forbidden:
-            try:
-                await message.channel.send("I don't have the required permissions!")
             except discord.Forbidden:
-                pass
+                try:
+                    await message.channel.send("I don't have the required permissions!")
+                except discord.Forbidden:
+                    pass
 
 client.run(credentials["discord-bot-token"])
