@@ -16,6 +16,7 @@ def write_db():
 @client.event
 async def on_ready():
     print(f"Logged in as {client.user} in {len(client.guilds)} guild(s)")
+    await client.change_presence(activity = discord.Game(f"{bot_info['default-prefix']}help | {len(client.guilds)} servers"))
 
 @client.event
 async def on_guild_join(guild):
