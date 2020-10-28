@@ -5,11 +5,13 @@
     "guilds": {
         "714926591259574382": {
             "prefix": "lfg!",
-            "modonly": 0
+            "modonly": 0,
+            "dmnotify": 1
         },
         "708978441969598525": {
             "prefix": "lfg!",
-            "modonly": 0
+            "modonly": 0,
+            "dmnotify": 0
         }
     },
     "requests": [
@@ -75,6 +77,33 @@
             "min-players": 3,
             "game": "bedwars",
             "active": 1
+        },
+        {
+            "author": 299591245976829952,
+            "message": 771084543905497108,
+            "channel": 716339110570360942,
+            "current-players": 1,
+            "min-players": 1,
+            "game": "Martin this is how you do spaces",
+            "active": 0
+        },
+        {
+            "author": 299591245976829952,
+            "message": 771086771299549234,
+            "channel": 716339110570360942,
+            "current-players": 0,
+            "min-players": 1,
+            "game": "Martin you can do spaces with commas",
+            "active": 0
+        },
+        {
+            "author": 299591245976829952,
+            "message": 771086869878276097,
+            "channel": 716339110570360942,
+            "current-players": 1,
+            "min-players": 1,
+            "game": "Minecraft",
+            "active": 0
         }
     ]
 }
