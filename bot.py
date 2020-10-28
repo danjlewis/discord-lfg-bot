@@ -101,7 +101,7 @@ async def on_message(message):
                                     if message.author.dm_channel == None:
                                         await message.author.create_dm()
                                     channel = message.author.dm_channel
-                            embed = discord.Embed(title = f"{db['bot']['display-name']} by {client.get_user(bot_info['creator-id']).name}")
+                            embed = discord.Embed(title = f"{db['bot']['display-name']} by {client.get_user(bot_info['creator-id'])}")
                             for name, value in bot_info["help-embed-fields"].items():
                                 embed.add_field(name = db["guilds"][str(message.guild.id)]["prefix"] + name, value = value, inline = False)
                             await channel.send(embed = embed)
@@ -151,6 +151,8 @@ async def on_message(message):
                                     await message.channel.send("The number of players must be a positive non-zero number!")
                                 elif int(args[2]) <= 0:
                                     await message.channel.send("The number of players must be a positive non-zero number!")
+                                elif "@everyone" in message.content or "@here" in message.content:
+                                    await message.channel.send("You can't mention everyone through the bot!")
                                 else:
                                     min_players = int(args[2])
                                     mention = None
