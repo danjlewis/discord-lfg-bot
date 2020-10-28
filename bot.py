@@ -100,7 +100,7 @@ async def on_message(message):
                                     if message.author.dm_channel == None:
                                         await message.author.create_dm()
                                     channel = message.author.dm_channel
-                            embed = discord.Embed(title = f"{db['bot']['display-name']} command list")
+                            embed = discord.Embed(title = f"{db['bot']['display-name']} by {client.get_user(bot_info['creator-id']).name}")
                             for name, value in bot_info["help-embed-fields"].items():
                                 embed.add_field(name = db["guilds"][str(message.guild.id)]["prefix"] + name, value = value, inline = False)
                             await channel.send(embed = embed)
