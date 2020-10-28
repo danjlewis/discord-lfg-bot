@@ -21,6 +21,60 @@
             "min-players": 5,
             "game": "Among Us",
             "active": 1
+        },
+        {
+            "author": 299591245976829952,
+            "message": 770743570289917983,
+            "channel": 715870384943267840,
+            "current-players": 1,
+            "min-players": 3,
+            "game": "Bedwars",
+            "active": 1
+        },
+        {
+            "author": 299591245976829952,
+            "message": 770766191479619655,
+            "channel": 715870384943267840,
+            "current-players": 3,
+            "min-players": 3,
+            "game": "Among Us",
+            "active": 0
+        },
+        {
+            "author": 299591245976829952,
+            "message": 770766280759705601,
+            "channel": 715870384943267840,
+            "current-players": 0,
+            "min-players": 3,
+            "game": "Bedwars",
+            "active": 1
+        },
+        {
+            "author": 299591245976829952,
+            "message": 771009634763931676,
+            "channel": 715870384943267840,
+            "current-players": 3,
+            "min-players": 4,
+            "game": "Among Us",
+            "active": 0
+        },
+        {
+            "author": 715201171538706473,
+            "message": 771015562636951572,
+            "channel": 715870384943267840,
+            "current-players": 4,
+            "min-players": 6,
+            "game": "among-us",
+            "active": 1
+        },
+        {
+            "author": 299591245976829952,
+            "message": 771024464342548490,
+            "channel": 715870384943267840,
+            "current-players": 1,
+            "min-players": 3,
+            "game": "bedwars",
+            "active": 1
         }
     ]
 }
