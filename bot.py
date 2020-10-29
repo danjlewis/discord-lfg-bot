@@ -18,9 +18,9 @@ reaction_blocked_users = []
 
 def write_db():
     global db
+    db["requests"] = list(filter(lambda x : (datetime.datetime.now() - datetime.datetime.strptime(x["time"], "%d%m%Y%H%M%S") \
+                                    < datetime.timedelta(hours = 24)) and bool(x["active"]), db["requests"]))
     with open("database.json", 'w') as f:
-        db["requests"] = list(filter(lambda x : (datetime.datetime.now() - datetime.datetime.strptime(x["time"], "%d%m%Y%H%M%S") \
-                                        < datetime.timedelta(hours = 24)) and bool(x["active"]), db["requests"]))
         json.dump(db, f, indent = 4)
 
 async def cache_reset():
@@ -100,14 +100,12 @@ async def on_raw_reaction_add(payload):
                             message = await channel.fetch_message(request["message"])
                         except (discord.NotFound, discord.Forbidden):
                             db["requests"][index]["active"] = 0
-                            write_db()
                             continue
 
                         reactions = message.reactions
                         matching = list(filter(lambda x : x.emoji == "👍", reactions))
                         if len(matching) < 1:
                             db["requests"][index]["active"] = 0
-                            write_db()
                             continue
                         else:
                             thumbsup = matching[0]
@@ -131,7 +129,7 @@ async def on_raw_reaction_add(payload):
                                         ' '.join([x.mention for x in list(filter(lambda x : x.id != bot_info["bot-id"], users))]))
                                 except discord.Forbidden:
                                     pass
-                        write_db()
+                write_db()
 
 @client.event
 async def on_message(message):
