@@ -1,9 +1,13 @@
 {
     "default-prefix": "lfg!",
+    "invite-link": "https://discord.com/api/oauth2/authorize?client_id=770631890122178560&permissions=67136576&scope=bot",
     "bot-id": 770631890122178560,
     "creator-id": 299591245976829952,
+    "command-block-threshold": 4,
+    "reaction-block-threshold": 4,
     "help-embed-fields": {
         "help [DM:server]": "Shows this help dialogue.",
+        "invite": "Shows the bot's invite link.",
         "prefix <prefix>": "Changes the bot prefix on this server (MODERATOR ONLY).",
         "renamebot <name>": "Renames the bot on all servers (CREATOR ONLY).",
         "shutdownbot": "Shuts down the bot (CREATOR ONLY).",
