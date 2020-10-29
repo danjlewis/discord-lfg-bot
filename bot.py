@@ -163,6 +163,12 @@ async def on_message(message):
                                 for name, value in bot_info["help-embed-fields"].items():
                                     embed.add_field(name = db["guilds"][str(message.guild.id)]["prefix"] + name, value = value, inline = False)
                                 await channel.send(embed = embed)
+                        
+                        elif args[0].lower() == "invite":
+                            if len(args) != 1:
+                                await message.channel.send("Incorrect number of arguments!")
+                            else:
+                                await message.channel.send(bot_info["invite-link"])
 
                         elif args[0].lower() == "prefix":
                             if len(args) != 2:
