@@ -12,7 +12,9 @@ bot_info = json.load(open("bot-info.json"))
 db = json.load(open("database.json"))
 
 command_cache = []
-blocked_users = []
+reaction_cache = []
+command_blocked_users = []
+reaction_blocked_users = []
 
 def write_db():
     global db
@@ -22,29 +24,44 @@ def write_db():
         json.dump(db, f, indent = 4)
 
 async def cache_reset():
-    global command_cache, blocked_users
+    global command_cache, reaction_cache, command_blocked_users, reaction_blocked_users
     while True:
         freq = dict(collections.Counter(command_cache)).items()
         block = [(x[0], datetime.datetime.now()) for x in filter(lambda x : x[1] >= bot_info["command-block-threshold"], freq)]
-        blocked_users += block
+        command_blocked_users += block
         for user_id, _ in block:
             user = client.get_user(user_id)
             try:
                 if user.dm_channel == None:
                     await user.create_dm()
-                await user.dm_channel.send("Stop sending me so many commands! You'll be able to use my commands again in 60 seconds.")
+                await user.dm_channel.send(f"Stop sending me so many commands! You'll be able to use my commands again in 60 seconds.")
             except discord.Forbidden:
                 pass
         command_cache = []
+        freq = dict(collections.Counter(reaction_cache)).items()
+        block = [(x[0], datetime.datetime.now()) for x in filter(lambda x : x[1] >= bot_info["reaction-block-threshold"], freq)]
+        reaction_blocked_users += block
+        for user_id, _ in block:
+            user = client.get_user(user_id)
+            try:
+                if user.dm_channel == None:
+                    await user.create_dm()
+                await user.dm_channel.send(f"Stop reacting to so many LFG requests! You'll be able to react to them again in 60 seconds.")
+            except discord.Forbidden:
+                pass
+        reaction_cache = []
         await asyncio.sleep(10)
 
 async def block_reset():
-    global blocked_users
+    global command_blocked_users, reaction_blocked_users
     while True:
-        for user, time in blocked_users:
+        for user, time in command_blocked_users:
             if datetime.datetime.now() - time >= datetime.timedelta(minutes = 1):
-                blocked_users = list(filter(lambda x : x[0] != user, blocked_users))
-        await asyncio.sleep(2)
+                command_blocked_users = list(filter(lambda x : x[0] != user, command_blocked_users))
+        for user, time in reaction_blocked_users:
+            if datetime.datetime.now() - time >= datetime.timedelta(minutes = 1):
+                reaction_blocked_users = list(filter(lambda x : x[0] != user, reaction_blocked_users))
+        await asyncio.sleep(5)
 
 @client.event
 async def on_ready():
@@ -73,45 +90,48 @@ async def on_guild_join(guild):
 async def on_raw_reaction_add(payload):
     global db
     if payload.user_id != bot_info["bot-id"]:
-        for index, request in enumerate(db["requests"]):
-            if request["active"] == 1:
-                channel = client.get_channel(int(request["channel"]))
-                try:
-                    message = await channel.fetch_message(request["message"])
-                except (discord.NotFound, discord.Forbidden):
-                    db["requests"][index]["active"] = 0
-                    write_db()
-                    continue
-
-                reactions = message.reactions
-                matching = list(filter(lambda x : x.emoji == "👍", reactions))
-                if len(matching) < 1:
-                    db["requests"][index]["active"] = 0
-                    write_db()
-                    continue
-                else:
-                    thumbsup = matching[0]
-
-                db["requests"][index]["current-players"] = thumbsup.count - 1
-                if db["requests"][index]["current-players"] >= request["min-players"]:
-                    db["requests"][index]["active"] = 0
-                    users = await thumbsup.users().flatten()
-                    if db["guilds"][str(channel.guild.id)]["dmnotify"]:
-                        for client_user in users:
-                            try:
-                                user = client.get_user(client_user.id)
-                                if user.dm_channel == None:
-                                    await user.create_dm()
-                                await user.dm_channel.send(f"{client.get_user(request['author']).display_name}'s {request['game']} group in {channel.guild.name} has enough players!")
-                            except (discord.Forbidden, AttributeError, discord.NotFound):
-                                pass
-                    else:
+        if payload.message_id in [x["message"] for x in db["requests"]]:
+            reaction_cache.append(payload.user_id)
+            if payload.user_id not in [x[0] for x in reaction_blocked_users]:
+                for index, request in enumerate(db["requests"]):
+                    if request["active"] == 1:
+                        channel = client.get_channel(int(request["channel"]))
                         try:
-                            await channel.send(f"{client.get_user(request['author']).display_name}'s {request['game']} group has enough players! " + \
-                                ' '.join([x.mention for x in list(filter(lambda x : x.id != bot_info["bot-id"], users))]))
-                        except discord.Forbidden:
-                            pass
-                write_db()
+                            message = await channel.fetch_message(request["message"])
+                        except (discord.NotFound, discord.Forbidden):
+                            db["requests"][index]["active"] = 0
+                            write_db()
+                            continue
+
+                        reactions = message.reactions
+                        matching = list(filter(lambda x : x.emoji == "👍", reactions))
+                        if len(matching) < 1:
+                            db["requests"][index]["active"] = 0
+                            write_db()
+                            continue
+                        else:
+                            thumbsup = matching[0]
+
+                        db["requests"][index]["current-players"] = thumbsup.count - 1
+                        if db["requests"][index]["current-players"] >= request["min-players"]:
+                            db["requests"][index]["active"] = 0
+                            users = await thumbsup.users().flatten()
+                            if db["guilds"][str(channel.guild.id)]["dmnotify"]:
+                                for client_user in users:
+                                    try:
+                                        user = client.get_user(client_user.id)
+                                        if user.dm_channel == None:
+                                            await user.create_dm()
+                                        await user.dm_channel.send(f"{client.get_user(request['author']).display_name}'s {request['game']} group in {channel.guild.name} has enough players!")
+                                    except (discord.Forbidden, AttributeError, discord.NotFound):
+                                        pass
+                            else:
+                                try:
+                                    await channel.send(f"{client.get_user(request['author']).display_name}'s {request['game']} group has enough players! " + \
+                                        ' '.join([x.mention for x in list(filter(lambda x : x.id != bot_info["bot-id"], users))]))
+                                except discord.Forbidden:
+                                    pass
+                        write_db()
 
 @client.event
 async def on_message(message):
@@ -122,7 +142,7 @@ async def on_message(message):
         else:
             if message.content.lower().startswith(db["guilds"][str(message.guild.id)]["prefix"]):
                 command_cache.append(message.author.id)
-                if message.author.id not in [x[0] for x in blocked_users]:
+                if message.author.id not in [x[0] for x in command_blocked_users]:
                     try:
                         print(f"Command issued by {message.author}" + (f" in {message.guild}" if message.guild != None else "") + f": {message.content}")
                         args = message.content[len(db["guilds"][str(message.guild.id)]["prefix"]):].split(" ")
