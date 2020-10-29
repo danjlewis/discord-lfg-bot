@@ -15,14 +15,17 @@ command_cache = []
 blocked_users = []
 
 def write_db():
+    global db
     with open("database.json", 'w') as f:
+        db["requests"] = list(filter(lambda x : (datetime.datetime.now() - datetime.datetime.strptime(x["time"], "%d%m%Y%H%M%S") \
+                                        < datetime.timedelta(hours = 24)) and bool(x["active"]), db["requests"]))
         json.dump(db, f, indent = 4)
 
 async def cache_reset():
     global command_cache, blocked_users
     while True:
         freq = dict(collections.Counter(command_cache)).items()
-        block = [(x[0], datetime.datetime.now()) for x in filter(lambda x : x[1] > bot_info["command-block-threshold"], freq)]
+        block = [(x[0], datetime.datetime.now()) for x in filter(lambda x : x[1] >= bot_info["command-block-threshold"], freq)]
         blocked_users += block
         for user_id, _ in block:
             user = client.get_user(user_id)
@@ -39,7 +42,7 @@ async def block_reset():
     global blocked_users
     while True:
         for user, time in blocked_users:
-            if datetime.datetime.now() - time > datetime.timedelta(minutes = 1):
+            if datetime.datetime.now() - time >= datetime.timedelta(minutes = 1):
                 blocked_users = list(filter(lambda x : x[0] != user, blocked_users))
         await asyncio.sleep(2)
 
@@ -198,14 +201,15 @@ async def on_message(message):
                                                 mention = message.role_mentions[0].mention
 
                                             request = await message.channel.send(f"{message.author.display_name} wants to play {args[1].replace(',', ' ')} with at least {min_players} people (when {min_players + 1} users have reacted)! " + \
-                                                                        "If you want to play, react thumbs up on this message!")
+                                                                        "If you want to play, react thumbs up on this message! This request will stay open for 24 hours.")
 
                                             await message.delete()
                                             if mention != None:
                                                 await request.edit(content = request.content + f" {mention}")
                                             await request.add_reaction("👍")
 
-                                            db["requests"].append({"author": message.author.id, "message": request.id, "channel": request.channel.id, "current-players": 0, "min-players": min_players, "game": args[1].replace(',', ' '), "active": 1})
+                                            db["requests"].append({"author": message.author.id, "message": request.id, "channel": request.channel.id, "current-players": 0, "min-players": min_players,
+                                                                    "game": args[1].replace(',', ' '), "time": datetime.datetime.strftime(datetime.datetime.now(), "%d%m%Y%H%M%S"), "active": 1})
                                             write_db()
 
                         elif args[0].lower() == "togglemodonly":
