@@ -120,12 +120,12 @@ async def on_raw_reaction_add(payload):
                                         user = client.get_user(client_user.id)
                                         if user.dm_channel == None:
                                             await user.create_dm()
-                                        await user.dm_channel.send(f"{client.get_user(request['author']).display_name}'s {request['game']} group in {channel.guild.name} has enough players!")
+                                        await user.dm_channel.send(f"{client.get_user(request['author']).name}'s {request['game']} group in {channel.guild.name} has enough players!")
                                     except (discord.Forbidden, AttributeError, discord.NotFound):
                                         pass
                             else:
                                 try:
-                                    await channel.send(f"{client.get_user(request['author']).display_name}'s {request['game']} group has enough players! " + \
+                                    await channel.send(f"{client.get_user(request['author']).name}'s {request['game']} group has enough players! " + \
                                         ' '.join([x.mention for x in list(filter(lambda x : x.id != bot_info["bot-id"], users))]))
                                 except discord.Forbidden:
                                     pass
