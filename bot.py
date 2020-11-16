@@ -74,6 +74,7 @@ async def on_ready():
 @client.event
 async def on_guild_join(guild):
     global db
+    await client.change_presence(activity = discord.Game(f"{bot_info['default-prefix']}help | {len(client.guilds)} servers"))
     for _ in range(1800):
         if guild.me.display_name != db["bot"]["display-name"]:
             try:
@@ -87,6 +88,10 @@ async def on_guild_join(guild):
     write_db()
 
 @client.event
+async def on_guild_remove(guild):
+    await client.change_presence(activity = discord.Game(f"{bot_info['default-prefix']}help | {len(client.guilds)} servers"))
+
+@client.event
 async def on_raw_reaction_add(payload):
     global db
     if payload.user_id != bot_info["bot-id"]:
@@ -95,10 +100,10 @@ async def on_raw_reaction_add(payload):
             if payload.user_id not in [x[0] for x in reaction_blocked_users]:
                 for index, request in enumerate(db["requests"]):
                     if request["active"] == 1:
-                        channel = client.get_channel(int(request["channel"]))
+                        channel = client.get_channel(request["channel"])
                         try:
                             message = await channel.fetch_message(request["message"])
-                        except (discord.NotFound, discord.Forbidden):
+                        except (discord.NotFound, discord.Forbidden, AttributeError):
                             db["requests"][index]["active"] = 0
                             continue
 
