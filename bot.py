@@ -16,8 +16,15 @@ reaction_cache = []
 command_blocked_users = []
 reaction_blocked_users = []
 
-def write_db():
+async def write_db():
     global db
+    expired_requests = list(filter(lambda x : (datetime.datetime.now() - datetime.datetime.strptime(x["time"], "%d%m%Y%H%M%S") \
+                                    >= datetime.timedelta(hours = 24)) and bool(x["active"]), db["requests"]))
+    for req in expired_requests:
+        try:
+            await client.get_message(req['message']).delete()
+        except (discord.Forbidden, discord.NotFound):
+            pass
     db["requests"] = list(filter(lambda x : (datetime.datetime.now() - datetime.datetime.strptime(x["time"], "%d%m%Y%H%M%S") \
                                     < datetime.timedelta(hours = 24)) and bool(x["active"]), db["requests"]))
     with open("database.json", 'w') as f:
@@ -85,7 +92,7 @@ async def on_guild_join(guild):
             break
 
     db["guilds"][str(guild.id)] = {"prefix": bot_info["default-prefix"], "modonly": 0, "dmnotify": 0}
-    write_db()
+    await write_db()
 
 @client.event
 async def on_guild_remove(guild):
@@ -134,7 +141,7 @@ async def on_raw_reaction_add(payload):
                                         ' '.join([x.mention for x in list(filter(lambda x : x.id != bot_info["bot-id"], users))]))
                                 except discord.Forbidden:
                                     pass
-                write_db()
+                await write_db()
 
 @client.event
 async def on_message(message):
@@ -181,7 +188,7 @@ async def on_message(message):
                                     await message.channel.send("Only server moderators can do that! They need to have the Manage Server permission.")
                                 else:
                                     db["guilds"][str(message.guild.id)]["prefix"] = args[1]
-                                    write_db()
+                                    await write_db()
                                     await message.channel.send(f"Prefix successfully changed to {args[1]}.")
 
                         elif args[0].lower() == "renamebot":
@@ -192,7 +199,7 @@ async def on_message(message):
                                     for guild in client.guilds:
                                         await guild.me.edit(nick = ' '.join(args[1:]))
                                     db["bot"]["display-name"] = ' '.join(args[1:])
-                                    write_db()
+                                    await write_db()
                                     await message.channel.send("Nickname successfully changed in all guilds.")
                                 else:
                                     await message.channel.send("Only my creator can do that!")
@@ -239,7 +246,7 @@ async def on_message(message):
 
                                             db["requests"].append({"author": message.author.id, "message": request.id, "channel": request.channel.id, "current-players": 0, "min-players": min_players,
                                                                     "game": args[1].replace(',', ' '), "time": datetime.datetime.strftime(datetime.datetime.now(), "%d%m%Y%H%M%S"), "active": 1})
-                                            write_db()
+                                            await write_db()
 
                         elif args[0].lower() == "togglemodonly":
                             if len(args) != 1:
@@ -250,7 +257,7 @@ async def on_message(message):
                                 else:
                                     modonly = int(not bool(db["guilds"][str(message.guild.id)]["modonly"]))
                                     db["guilds"][str(message.guild.id)]["modonly"] = modonly
-                                    write_db()
+                                    await write_db()
                                     await message.channel.send("Successfully enabled moderator only mode." if modonly else "Successfully disabled moderator only mode.")
 
                         elif args[0].lower() == "toggledmnotify":
@@ -262,7 +269,7 @@ async def on_message(message):
                                 else:
                                     dmnotify = int(not bool(db["guilds"][str(message.guild.id)]["dmnotify"]))
                                     db["guilds"][str(message.guild.id)]["dmnotify"] = dmnotify
-                                    write_db()
+                                    await write_db()
                                     await message.channel.send("Successfully enabled DM notification mode." if dmnotify else "Successfully disabled DM notification mode.")
 
                         else:
